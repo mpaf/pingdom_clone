@@ -1,6 +1,6 @@
 import threading, time
 import yaml
-import urllib.request
+import requests
 from getchar import getch
 
 sites = yaml.load(open('config.yml', 'r'))
@@ -18,14 +18,12 @@ def check_site(site):
         in a thread '''
 
     print("Checking site:", site)
-    request = urllib.request.Request(site['url'])
-    request.add_header('Accept-Encoding', 'gzip, deflate')
-    response = urllib.request.urlopen(request)
-    content_type = response.headers.get_content_charset()
-    print("Encoding:", content_type)
-    print(request.headers)
-    print(response.geturl())
-    response.close()
+    r = requests.get(site['url'])
+    print(r.elapsed.total_seconds())
+    print(r.headers['content-type'])
+    print(r.encoding)
+    print(r.url)
+    print(site['content'] in r.text)
     t = threading.Timer(repeat_rate, check_site, [site])
     # set the daemon flag to exit the application, once the main
     # process stops

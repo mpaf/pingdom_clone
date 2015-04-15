@@ -1,0 +1,11 @@
+# Please specify your endpoints, and the expected content
+# 
+Sites:
+#eg.
+#    - url: "http://www.google.com"
+#      content: ""
+#    - url: https://www.f-secure.com
+#      content: Security
+    
+    - url: https://www.google.com
+      content: Lucky

@@ -90,7 +90,9 @@ def main(repeat_rate, sites):
     atexit.register(dump_sites)
 
     # set a recurring thread to dump all site info to disk
-    threading.Thread(target=dump_sites, daemon=True).start()
+    t=threading.Timer(DUMP_RATE, dump_sites, [DUMP_RATE])
+    t.daemon=True
+    t.start()
 
     for site in sites:
         # adjust timeout to be slightly smaller than refresh rate of thread
@@ -101,7 +103,8 @@ if __name__ == '__main__':
   parser = OptionParser()
   parser.add_option("-l", "--loglevel", dest="loglevel", default="INFO",
                     help="Set logging level")
-  parser.add_option("--nohistory", dest="nohistory", action="store_true")
+  parser.add_option("--nohistory", dest="nohistory", action="store_true",
+                    help="erase pickled site data history from disk")
   parser.add_option("-r", "--refresh_rate", dest="rate",
                     help="Set ping refresh rate")
 

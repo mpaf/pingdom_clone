@@ -10,31 +10,34 @@ logger.setLevel(logging.INFO)
 saved_sites_file = 'saved_sites.pkl'
 
 class Site(object):
-  
-  resp_time = []  
+
   def __repr__(self):
     return "<site url:'{0}' content_str '{1}'>".format(self.url, self.content_str)
   def __eq__(self, other):
     return self.url == other.url
+  # hash of object to allow creation of sets
+  def __hash__(self):
+     return hash(self.url)
 
   def __init__(self, url, content_str):
     self.url = url
     self.content_str = content_str
+    self.resp_time=[]
 
   def add_time(self, response_time):
     if type(response_time) != float:
       raise TypeError("response time must be a float")
- 
+    logger.info("saving response time: {0}".format(response_time))
     self.resp_time.append([time.time(), response_time])
 
 def pickle_to_file(sites):
-  
+
   if sites:
     if type(sites) == list:
       if type(sites[0]) == Site:
         with open(saved_sites_file, 'wb') as output:
           pickle.dump(sites, output, pickle.HIGHEST_PROTOCOL)
-          return 
+          return
   raise TypeError("Site list empty or of incorrect type")
 
 def pickled_sites():
@@ -53,12 +56,16 @@ def pickled_sites():
 
 def configed_sites(sites_dict):
   cfg_sites = []
-  
+
   for site in sites_dict:
     site_obj = Site(site['url'], site['content'])
-    cfg_sites.append(site_obj)
-    logger.debug('found site {0} in config file'.format(site_obj))
-  
+    if site_obj in cfg_sites:  # this works thanks to equality and hash
+                               # functions defined in class
+        logger.warning('Found duplicate site {0}'.format(site_obj.url))
+    else:
+        cfg_sites.append(site_obj)
+        logger.debug('found site {0} in config file'.format(site_obj.url))
+
   return cfg_sites
 
 def get_sites(cfg_sites_dict):
@@ -66,14 +73,14 @@ def get_sites(cfg_sites_dict):
       to disk '''
 
   cfg_sites = configed_sites(cfg_sites_dict)
-  saved_sites = pickled_sites()  
+  saved_sites = pickled_sites()
   for cfg_site in cfg_sites:
-    logger.debug('process cfg site {0}'.format(cfg_site)) 
+    logger.debug('process cfg site {0}'.format(cfg_site))
     found_saved = next((x for x in saved_sites if x.url == cfg_site.url), None)
     if found_saved:
       logger.debug('found saved site, copy response time series {0}'.format(found_saved.resp_time))
       cfg_site.resp_time = found_saved.resp_time
     else:
       logger.debug('saved site not in cfg, discard')
-  
+
   return cfg_sites

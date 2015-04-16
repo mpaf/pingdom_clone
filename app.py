@@ -9,13 +9,16 @@ from optparse import OptionParser
 from flask import Flask, render_template
 
 webapp = Flask(__name__)
+global sites
+
+sites = []
 
 @webapp.route('/')
 def http_index():
   global sites
 
   return render_template('index.html', sites=sites)
- 
+
 DEFAULT_RATE = 2
 
 # Sets up logging
@@ -34,7 +37,7 @@ def check_site(site):
     logger.info("Site {0} returned code {1}".format(site.url, r.status_code))
     # add response time to time-series
     site.add_time(r.elapsed.total_seconds())
-    
+
     logger.debug(r.elapsed.total_seconds())
     logger.debug(r.headers['content-type'])
     logger.debug(r.encoding)
@@ -67,18 +70,18 @@ if __name__ == '__main__':
   parser.add_option("-r", "--refresh_rate", dest="rate",
                     help="Set ping refresh rate")
 
-  (options, args) = parser.parse_args()  
-  config = yaml.load(open(config_file, 'r'))  
+  (options, args) = parser.parse_args()
+  config = yaml.load(open(config_file, 'r'))
   sites = models.get_sites(config['Sites'])
-  
+
   logger.setLevel(getattr(logging, options.loglevel))
-  
+
   if options.rate:
     repeat_rate = int(options.rate)
   elif 'refresh_rate' in config.keys():
     repeat_rate = int(config['refresh_rate'])
   else:
     repeat_rate = DEFAULT_RATE # How often will a site be 'pinged'
-  
+
   logger.info("Site refresh rate set to {0}".format(repeat_rate))
   main(repeat_rate, sites)

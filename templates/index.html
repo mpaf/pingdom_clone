@@ -1,5 +1,8 @@
 <html>
 <head>
+  <!-- Load bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{url_for('static', filename='pingdomclone.css')}}">
   <!--Load the AJAX API-->
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript">
@@ -10,23 +13,18 @@
     // Set a callback to run when the Google Visualization API is loaded.
     google.setOnLoadCallback(main);
 
-    // Callback that creates and populates a data table,
-    // instantiates the pie chart, passes in the data and
-    // draws it.
     function drawChart(datapoints, ind) {
 
       // Create the data table.
       var data = new google.visualization.DataTable();
       data.addColumn('number', 'Date');
       data.addColumn('number', 'Response time');
-      data.addRows(datapoints);
+      data.addRows(datapoints.slice(1, 200));
 
-      // Set chart options
-      var options = {'title':'request time',
-                     'width':400,
-                     'height':300};
+      // chart options
+      var options = {'title':'request time (only 200 last samples)'};
 
-      // Instantiate and draw our chart, passing in some options.
+      // Instantiate and draw chart
       var chart = new google.visualization.LineChart(document.getElementById('chart'+ind));
       chart.draw(data, options);
     }
@@ -42,12 +40,23 @@
   </script>
 </head>
 <body>
-  <title>Pingdom-clone in Python!</title>
+  <title>Pingdom-clone in Python</title>
   <h1>Sites available</h1>
   <ul>
   {% for site in sites %}
-  <li><a href="{{site.url}}">{{site.url}}</a></li>
-  <div id="chart{{loop.index}}">chart here</div>
+  <li>
+    <span><a href="{{site.url}}">{{site.url}}</a></span>
+    <span>HTTP {{site.last_http_code}}</span>
+    <div class="responsetimes" id="chart{{loop.index}}"></div>
+    {% if not site.last_http_code %}
+    <span class="glyphicon glyphicon-minus" aria-hidden="true">
+    {% elif site.last_http_code >= 200 and site.last_http_code < 300 %}
+    <span class="glyphicon glyphicon-arrow-up checkup" aria-hidden="true">
+    {% else %}
+    <span class="glyphicon glyphicon-arrow-down checkdown" aria-hidden="true">
+    {% endif %}
+    </span>
+  </li>
   {% endfor %}
   </ul>
 </body>

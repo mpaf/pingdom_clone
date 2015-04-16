@@ -1,0 +1,27 @@
+body ul li span {
+  vertical-align: middle;
+  font-size: 20wpx;
+}
+
+span {
+  padding: 12px;
+}
+
+span.glyphicon {
+  font-size: 6em;
+}
+
+span.checkup {
+  color: green;
+}
+
+span.checkdown {
+  color: red;
+}
+
+div.responsetimes {
+  display: inline-block;
+  vertical-align: middle;
+  width: 500px;
+  height: 300px;
+}

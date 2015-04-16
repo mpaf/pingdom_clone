@@ -5,13 +5,26 @@ import requests
 from getchar import getch
 import models
 import logging
+import yaml
+from optparse import OptionParser
+
+DEFAULT_RATE = 2
+
+# Sets up logging
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
 
-repeat_rate = 2 # How often will a site be 'pinged'
+config_file = 'config.yml'
 
-sites = models.get_sites()
+config = yaml.load(open(config_file, 'r'))  
+sites = models.get_sites(config['Sites'])
+
+if 'refresh_rate' in config.keys():
+  repeat_rate = int(config['refresh_rate'])
+else:
+  repeat_rate = DEFAULT_RATE # How often will a site be 'pinged'
+
+logger.info("Site refresh rate set to {0}".format(repeat_rate))
 
 def input_thread(stop_flag):
     print("Press a key to quit...")
@@ -24,17 +37,17 @@ def check_site(site):
         to find site['content']. It will run every x secs
         in a thread '''
 
-    logger.info("Checking site: {0}".format(site))
+    logger.debug("Checking site: {0}".format(site))
     r = requests.get(site.url)
-
+    logger.info("Site {0} returned code {1}".format(site.url, r.status_code))
     # add response time to time-series
     site.add_time(r.elapsed.total_seconds())
     
-    logger.info(r.elapsed.total_seconds())
-    logger.info(r.headers['content-type'])
-    logger.info(r.encoding)
-    logger.info(r.url)
-    logger.info(site.content_str in r.text)
+    logger.debug(r.elapsed.total_seconds())
+    logger.debug(r.headers['content-type'])
+    logger.debug(r.encoding)
+    logger.debug(r.url)
+    logger.info('Found string in site {0}: {1}'.format(site.url, site.content_str in r.text))
     t = threading.Timer(repeat_rate, check_site, [site])
     # set the daemon flag to exit the application, once the main
     # process stops
@@ -62,4 +75,12 @@ def main():
 
 if __name__ == '__main__':
 
-    main()
+  parser = OptionParser()
+  parser.add_option("-l", "--loglevel", dest="loglevel", default="INFO",
+                    help="Set logging level")
+  parser.add_option("-r", "--refresh_rate", dest="rate", default=2,
+                    help="Set ping refresh rate")
+
+  (options, args) = parser.parse_args()  
+  logger.setLevel(getattr(logging, options.loglevel))
+  main()

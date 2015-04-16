@@ -1,5 +1,7 @@
 # Please specify your endpoints, and the expected content
 # 
+
+refresh_rate: 10
 Sites:
 #eg.
 #    - url: "http://www.google.com"

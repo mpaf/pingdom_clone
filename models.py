@@ -1,14 +1,13 @@
-import yaml
 import time
 import pickle
 import logging
 
+# Sets up logging
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 saved_sites_file = 'saved_sites.pkl'
-config_file = 'config.yml'
 
 class Site(object):
   
@@ -52,22 +51,21 @@ def pickled_sites():
 
   return saved_sites
 
-def configed_sites():
+def configed_sites(sites_dict):
   cfg_sites = []
-  sites = yaml.load(open(config_file, 'r'))  
   
-  for site in sites['Sites']:
+  for site in sites_dict:
     site_obj = Site(site['url'], site['content'])
     cfg_sites.append(site_obj)
     logger.debug('found site {0} in config file'.format(site_obj))
   
   return cfg_sites
 
-def get_sites():
+def get_sites(cfg_sites_dict):
   ''' change cfg_sites to add possible data series saved
       to disk '''
 
-  cfg_sites = configed_sites()
+  cfg_sites = configed_sites(cfg_sites_dict)
   saved_sites = pickled_sites()  
   for cfg_site in cfg_sites:
     logger.debug('process cfg site {0}'.format(cfg_site)) 

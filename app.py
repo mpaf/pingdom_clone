@@ -25,12 +25,6 @@ logger.addHandler(logging.StreamHandler())
 
 config_file = 'config.yml'
 
-def input_thread(stop_flag):
-    print("Press a key to quit...")
-    input()
-    stop_flag.append(None)
-    return
-
 def check_site(site):
     ''' This function pings the site['url'] and attempts
         to find site['content']. It will run every x secs
@@ -60,10 +54,6 @@ def dump_sites():
 
 def main(repeat_rate, sites):
     atexit.register(dump_sites)
-    #stop_flag = []
-    #thread = threading.Thread(target=input_thread, args=(stop_flag,))
-    #thread.start()
-    #print("Processing {0} sites".format(len(sites['Sites'])))
 
     for site in sites:
         threading.Thread(target=check_site, args=(site,), daemon=True).start()

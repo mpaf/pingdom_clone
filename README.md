@@ -11,13 +11,13 @@ Date: 15-04-2015
   - checkout this repo
   - create a virtualenv with Python34 (optional)
   - install package requirements (make sure you're using right Python version)
-  ```sh
+```sh
       pip install -r requirements.txt 
-  ```
+```
   - start with:
-  ```sh
+```sh
       python app.py [-r check_rate] [-l LOGLEVEL] [--nohistory]
-  ```
+```
 
 ##Design considerations:
 

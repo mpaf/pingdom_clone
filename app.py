@@ -27,27 +27,39 @@ logger.addHandler(logging.StreamHandler())
 
 config_file = 'config.yml'
 
-def check_site(site):
+def check_site(site, timeout):
     ''' This function pings the site['url'] and attempts
         to find site['content']. It will run every x secs
         in a thread '''
 
-    logger.debug("Checking site: {0}".format(site))
-    r = requests.get(site.url)
-    logger.info("Site {0} returned code {1}".format(site.url, r.status_code))
-    # add response time to time-series
-    site.add_time(r.elapsed.total_seconds())
+    logger.debug("Checking site: {0} with timeout {1}".format(site, timeout))
+    try:
+        # Set a timeout that is smaller than the next refresh of the site
+        r = requests.get(site.url, timeout=timeout)
+        logger.info("Site {0} returned code {1}".format(site.url, r.status_code))
+        # add response time to time-series
+        site.add_time(r.elapsed.total_seconds())
+        site.last_http_code = r.status_code
+        logger.debug(r.elapsed.total_seconds())
+        logger.debug(r.headers['content-type'])
+        logger.debug(r.encoding)
+        logger.debug(r.url)
+        logger.info('Found string in site {0}: {1}'.format(site.url, site.content_str in r.text))
+        t = threading.Timer(repeat_rate, check_site, [site, timeout])
+        # set the daemon flag to exit the application, once the main
+        # process stops
+        t.daemon=True
+        t.start()
+    except requests.exceptions.Timeout:
+        logger.warning("Timed out checking for {0}, will try again".format(site.url))
+        t = threading.Timer(repeat_rate, check_site, [site, timeout])
+        t.daemon=True
+        t.start()
 
-    logger.debug(r.elapsed.total_seconds())
-    logger.debug(r.headers['content-type'])
-    logger.debug(r.encoding)
-    logger.debug(r.url)
-    logger.info('Found string in site {0}: {1}'.format(site.url, site.content_str in r.text))
-    t = threading.Timer(repeat_rate, check_site, [site])
-    # set the daemon flag to exit the application, once the main
-    # process stops
-    t.daemon=True
-    t.start()
+    except Exception as e:
+        # exception requesting site, log warning and don't attempt to request
+        # site again
+        logger.warning("Error requesting {0}: {1}".format(site.url, e))
 
 def dump_sites():
     global sites
@@ -58,9 +70,8 @@ def main(repeat_rate, sites):
     atexit.register(dump_sites)
 
     for site in sites:
-        threading.Thread(target=check_site, args=(site,), daemon=True).start()
-
-    webapp.run(host='0.0.0.0', port=8080)
+        # adjust timeout to be slightly smaller than refresh rate of thread
+        threading.Thread(target=check_site, args=(site, repeat_rate-0.01), daemon=True).start()
 
 if __name__ == '__main__':
 
@@ -72,7 +83,7 @@ if __name__ == '__main__':
 
   (options, args) = parser.parse_args()
   config = yaml.load(open(config_file, 'r'))
-  sites = models.get_sites(config['Sites'])
+  sites = models.get_sites(config['sites'])
 
   logger.setLevel(getattr(logging, options.loglevel))
 
@@ -85,3 +96,4 @@ if __name__ == '__main__':
 
   logger.info("Site refresh rate set to {0}".format(repeat_rate))
   main(repeat_rate, sites)
+  webapp.run(debug=True, host='0.0.0.0', port=8080)

@@ -2,7 +2,6 @@ import atexit
 import threading, time
 import pickle
 import requests
-from getchar import getch
 import models
 import logging
 import yaml

@@ -24,6 +24,7 @@ class Site(object):
     self.content_str = content_str
     self.resp_time=[]
     self.last_http_code = None
+    self.string_matched = False
 
   def add_time(self, response_time):
     if type(response_time) != float:

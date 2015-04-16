@@ -41,7 +41,7 @@
 </head>
 <body>
   <title>Pingdom-clone in Python</title>
-  <h1>Sites available</h1>
+  <h1>Checking {{ sites|length }} sites for uptime</h1>
   <ul>
   {% for site in sites %}
   <li>
@@ -49,13 +49,17 @@
     <span>HTTP {{site.last_http_code}}</span>
     <div class="responsetimes" id="chart{{loop.index}}"></div>
     {% if not site.last_http_code %}
-    <span class="glyphicon glyphicon-minus" aria-hidden="true">
-    {% elif site.last_http_code >= 200 and site.last_http_code < 300 %}
-    <span class="glyphicon glyphicon-arrow-up checkup" aria-hidden="true">
+    <span class="glyphicon glyphicon-minus unknown" aria-hidden="true"></span>
+    {% elif site.last_http_code >= 200 and site.last_http_code < 300 and site.string_matched %}
+    <span class="glyphicon glyphicon-arrow-up checkup" aria-hidden="true"></span>
+    <span>"{{site.content_str}}" found on page</span>
+    {% elif site.last_http_code >= 200 and site.last_http_code < 300 and not site.string_matched %}
+    <span class="glyphicon glyphicon-arrow-down nomatch" aria-hidden="true"></span>
+    <span>"{{site.content_str}}" not found on page</span>
     {% else %}
-    <span class="glyphicon glyphicon-arrow-down checkdown" aria-hidden="true">
+    <span class="glyphicon glyphicon-arrow-down checkdown" aria-hidden="true"></span>
+    <span>HTTP Error</span>
     {% endif %}
-    </span>
   </li>
   {% endfor %}
   </ul>

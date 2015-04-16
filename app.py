@@ -40,11 +40,12 @@ def check_site(site, timeout):
         # add response time to time-series
         site.add_time(r.elapsed.total_seconds())
         site.last_http_code = r.status_code
+        site.string_matched = site.content_str in r.text
         logger.debug(r.elapsed.total_seconds())
         logger.debug(r.headers['content-type'])
         logger.debug(r.encoding)
         logger.debug(r.url)
-        logger.info('Found string in site {0}: {1}'.format(site.url, site.content_str in r.text))
+        logger.info('Found string in site {0}: {1}'.format(site.url, site.string_matched))
         t = threading.Timer(repeat_rate, check_site, [site, timeout])
         # set the daemon flag to exit the application, once the main
         # process stops

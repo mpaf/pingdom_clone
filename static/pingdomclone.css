@@ -11,12 +11,20 @@ span.glyphicon {
   font-size: 6em;
 }
 
+span.unknown {
+  color: gray;
+}
+
 span.checkup {
   color: green;
 }
 
 span.checkdown {
   color: red;
+}
+
+span.nomatch {
+  color: #FBB917;
 }
 
 div.responsetimes {

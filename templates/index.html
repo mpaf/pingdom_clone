@@ -1,0 +1,8 @@
+<title>Pingdom-clone in Python!</title>
+<h1>Sites available</h1>
+<ul>
+{% for site in sites %}
+<li><a href="{{site.url}}">{{site.url}}</a>{{site.resp_time}}</li>
+{% endfor %}
+</ul>
+

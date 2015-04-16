@@ -7,7 +7,16 @@ import models
 import logging
 import yaml
 from optparse import OptionParser
+from flask import Flask, render_template
 
+webapp = Flask(__name__)
+
+@webapp.route('/')
+def http_index():
+  global sites
+
+  return render_template('index.html', sites=sites)
+ 
 DEFAULT_RATE = 2
 
 # Sets up logging
@@ -59,7 +68,7 @@ def main(repeat_rate, sites):
     for site in sites:
         threading.Thread(target=check_site, args=(site,), daemon=True).start()
 
-    input()
+    webapp.run(host='0.0.0.0', port=8080)
 
 if __name__ == '__main__':
 

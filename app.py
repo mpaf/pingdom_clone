@@ -78,6 +78,7 @@ if __name__ == '__main__':
   parser = OptionParser()
   parser.add_option("-l", "--loglevel", dest="loglevel", default="INFO",
                     help="Set logging level")
+  parser.add_option("--nohistory", dest="nohistory", action="store_true")
   parser.add_option("-r", "--refresh_rate", dest="rate",
                     help="Set ping refresh rate")
 
@@ -86,6 +87,14 @@ if __name__ == '__main__':
   sites = models.get_sites(config['sites'])
 
   logger.setLevel(getattr(logging, options.loglevel))
+
+  if options.nohistory:
+    import os
+    try:
+      os.remove(os.path.abspath(models.saved_sites_file))
+      logger.info("Removed {0} cache file".format(models.saved_sites_file))
+    except:
+      logger.info("Could not remove {0} cache file".format(os.path.abspath(models.saved_sites_file)))
 
   if options.rate:
     repeat_rate = int(options.rate)

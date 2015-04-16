@@ -6,8 +6,8 @@ Sites:
 #      content: ""
 #    - url: https://www.f-secure.com
 #      content: Security
-    - url: https://www.facebook.com
-      content: connect with friends 
+#    - url: https://www.facebook.com
+#      content: connect with friends 
     - url: https://www.publico.pt
       content: CLASSIFICADOS         
     - url: http://www.fsecure.com

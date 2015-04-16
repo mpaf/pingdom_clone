@@ -63,9 +63,13 @@ def check_site(site, timeout):
         t.start()
 
     except Exception as e:
-        # exception requesting site, log warning and don't attempt to request
-        # site again
+        # exception requesting site, log warning and wait some time
+        # before attempting to request site again
         logger.warning("Error requesting {0}: {1}".format(site.url, e))
+        # wait 5x the normal check repeat rate
+        t = threading.Timer(5*repeat_rate, check_site, [site, timeout])
+        t.daemon=True
+        t.start()
 
 def dump_sites(dump_rate=DUMP_RATE):
     ''' pickle Site objects to the filesystem

@@ -19,7 +19,12 @@ def http_index():
 
   return render_template('index.html', sites=sites)
 
+# Frequency at which checks are run
+# (except if overriden by config file
+#  or command-line)
 DEFAULT_RATE = 2
+# Frequency at which Site data is saved to disk
+DUMP_RATE = 30
 
 # Sets up logging
 logger = logging.getLogger(__name__)
@@ -62,13 +67,26 @@ def check_site(site, timeout):
         # site again
         logger.warning("Error requesting {0}: {1}".format(site.url, e))
 
-def dump_sites():
+def dump_sites(dump_rate=DUMP_RATE):
+    ''' pickle Site objects to the filesystem
+        ran periodically at dump_rate, or when
+        app exits '''
     global sites
+    logger.info("saving all site data to disk")
     models.pickle_to_file(sites)
+    t = threading.Timer(dump_rate, dump_sites)
+    t.daemon=True
+    t.start()
     return
 
 def main(repeat_rate, sites):
+
+    # dump all sites and response times to a pickled file
+    # in the current directory
     atexit.register(dump_sites)
+
+    # set a recurring thread to dump all site info to disk
+    threading.Thread(target=dump_sites, daemon=True).start()
 
     for site in sites:
         # adjust timeout to be slightly smaller than refresh rate of thread

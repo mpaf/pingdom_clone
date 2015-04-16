@@ -18,3 +18,5 @@ sites:
       content: none
     - url: https://github.com/wrong_page
       content: This is not the web page
+    - url: https://aws.amazon.com
+      content: Amazon

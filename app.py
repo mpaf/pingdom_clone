@@ -16,16 +16,6 @@ logger.addHandler(logging.StreamHandler())
 
 config_file = 'config.yml'
 
-config = yaml.load(open(config_file, 'r'))  
-sites = models.get_sites(config['Sites'])
-
-if 'refresh_rate' in config.keys():
-  repeat_rate = int(config['refresh_rate'])
-else:
-  repeat_rate = DEFAULT_RATE # How often will a site be 'pinged'
-
-logger.info("Site refresh rate set to {0}".format(repeat_rate))
-
 def input_thread(stop_flag):
     print("Press a key to quit...")
     input()
@@ -59,14 +49,12 @@ def dump_sites():
     models.pickle_to_file(sites)
     return
 
-def main():
+def main(repeat_rate, sites):
     atexit.register(dump_sites)
     #stop_flag = []
     #thread = threading.Thread(target=input_thread, args=(stop_flag,))
     #thread.start()
     #print("Processing {0} sites".format(len(sites['Sites'])))
-    global repeat_rate
-    global sites
 
     for site in sites:
         threading.Thread(target=check_site, args=(site,), daemon=True).start()
@@ -78,9 +66,21 @@ if __name__ == '__main__':
   parser = OptionParser()
   parser.add_option("-l", "--loglevel", dest="loglevel", default="INFO",
                     help="Set logging level")
-  parser.add_option("-r", "--refresh_rate", dest="rate", default=2,
+  parser.add_option("-r", "--refresh_rate", dest="rate",
                     help="Set ping refresh rate")
 
   (options, args) = parser.parse_args()  
+  config = yaml.load(open(config_file, 'r'))  
+  sites = models.get_sites(config['Sites'])
+  
   logger.setLevel(getattr(logging, options.loglevel))
-  main()
+  
+  if options.rate:
+    repeat_rate = int(options.rate)
+  elif 'refresh_rate' in config.keys():
+    repeat_rate = int(config['refresh_rate'])
+  else:
+    repeat_rate = DEFAULT_RATE # How often will a site be 'pinged'
+  
+  logger.info("Site refresh rate set to {0}".format(repeat_rate))
+  main(repeat_rate, sites)

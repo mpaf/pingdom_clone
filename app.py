@@ -52,7 +52,7 @@ def check_site(site, timeout):
         else:
             content_string = '{0} NOT found!'.format(site.content_str)
         logger.info(
-            "Url:{0} returned HTTP code {1} in {2}s, {3} (detected {4} enc)"
+            "Url:{0} returned HTTP code {1} in {2}s, {3} ({4})"
             .format(site.url, r.status_code, r.elapsed.total_seconds(),
                     content_string, r.encoding)
         )
@@ -133,9 +133,9 @@ if __name__ == '__main__':
     import os
     try:
       os.remove(os.path.abspath(models.saved_sites_file))
-      logger.info("Removed {0} cache file".format(models.saved_sites_file))
+      logger.debug("Removed {0} cache file".format(models.saved_sites_file))
     except:
-      logger.info("Could not remove {0} cache file".format(os.path.abspath(models.saved_sites_file)))
+      logger.debug("Could not remove {0} cache file".format(os.path.abspath(models.saved_sites_file)))
 
   if options.rate:
     repeat_rate = int(options.rate)
@@ -144,6 +144,6 @@ if __name__ == '__main__':
   else:
     repeat_rate = DEFAULT_RATE # How often will a site be 'pinged'
 
-  logger.info("Site refresh rate set to {0}".format(repeat_rate))
+  logger.debug("Site refresh rate set to {0}".format(repeat_rate))
   main(repeat_rate, models.sites)
   webapp.run(debug=True, host='0.0.0.0', port=8080)

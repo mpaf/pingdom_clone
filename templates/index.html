@@ -17,12 +17,22 @@
 
       // Create the data table.
       var data = new google.visualization.DataTable();
-      data.addColumn('number', 'Date');
+      data.addColumn('datetime', 'Date');
       data.addColumn('number', 'Response time');
-      data.addRows(datapoints.slice(1, 200));
+      // get 200 last elements
+      sliced_data = datapoints.slice(Math.max(datapoints.length - 200, 1));
+      reformatted_data = sliced_data.map(function(tuple){
+        return ([new Date(tuple[0] * 1000), tuple[1]])
+      });
+      data.addRows(reformatted_data);
 
       // chart options
-      var options = {'title':'request time (only 200 last samples)'};
+      var options = {
+        'title':'request time (only 200 last samples)',
+        'hAxis': {
+          'format': 'HH:mm',
+        }
+      };
 
       // Instantiate and draw chart
       var chart = new google.visualization.LineChart(document.getElementById('chart'+ind));

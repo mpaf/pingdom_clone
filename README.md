@@ -36,7 +36,15 @@ If you want to change command-line parameters for the application, you can eithe
 
 ##Design considerations:
 
-  - Plot using google charts, only plots last 200 samples, so the plots converge to the same time period, and also limit the extent of the plots.
+### Distributed checks
+  - Content might be different when accessing from different regions (e.g. fsecure website redirects to Finnish content in Finland, not outside)
+  - Centralized data repository (database) used to synchronize the times from every checking server
+  - Separate web server from check loops.
+  - Sync site data across time-zones.
+  - Use encrypted SSL connections to database make sure data is not tampered with
+
+### General considerations
+  - Plot using google charts, only plots last 200 samples, to limit the extent of the plots.
   - Pickling/unpicking site object data to disk to achieve data persistence (solutions requiring a database or cache where not considered due to added complexity). This is done at application exit but also periodically in a separate thread.
   - Threads are daemonized so as soon as user CTRL+Cs to exit all threads terminate
   - If connection fails to a site, retry after a longer period of time (e.g. 10x check rate). The url could be bad but there's also a possibility of intermittent failures, so we shouldn't stop checking the url.

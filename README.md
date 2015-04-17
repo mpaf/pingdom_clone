@@ -12,11 +12,26 @@ Date: 15-04-2015
   - create a virtualenv with Python34 (optional)
   - install package requirements (make sure you're using right Python version)
 ```sh
-      pip install -r requirements.txt 
+      pip install -r requirements.txt
 ```
   - start with:
 ```sh
       python app.py [-r check_rate] [-l LOGLEVEL] [--nohistory]
+```
+
+## Running from docker
+
+If you have docker installed, you can run this application simply by running the following commands:
+```sh
+  docker build -t pingdom_clone .
+  docker run -d -p 8080:8080 pingdom_clone
+```
+And visit:
+http://localhost:8080/
+
+If you want to change command-line parameters for the application, you can either change the CMD parameter in the Dockerfile, or run (example):
+```sh
+  docker run -d -p 8080:8080 pingdom_clone python app.py -r 1 --nohistory -l DEBUG
 ```
 
 ##Design considerations:

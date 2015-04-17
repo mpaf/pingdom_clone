@@ -82,8 +82,9 @@ def check_site(site, timeout):
 webapp = Flask(__name__)
 @webapp.route('/')
 def http_index():
+  global sites
   # render a webpage with all the site information collected so far
-  return render_template('index.html', sites=models.sites)
+  return render_template('index.html', sites=sites)
 
 @webapp.route('/500')
 def error_page():
@@ -98,13 +99,13 @@ def pageNotFound(error):
 def pageError(error):
     return "Wow, you crashed our server! :'("
 
-def main_threads(repeat_rate, sites):
+def main(repeat_rate, sites):
   """ This function will start two daemon thread loops repeating
       every repeat_rate and DUMP_RATE to check url response and
       dump current Site model information to disk respectively. """
   # dump all sites and response times to a pickled file
   # in the current directory if application exits
-  atexit.register(models.dump_sites, [sites])
+  atexit.register(models.dump_sites, sites)
   # set a recurring thread to dump all site info to disk
   t=threading.Timer(DUMP_RATE, models.dump_sites, [sites, DUMP_RATE])
   t.daemon=True
@@ -156,9 +157,9 @@ if __name__ == '__main__':
 
   # store reference to list of sites in models
   # namespace to retrieve it in webserver views.
-  models.sites = models.get_sites(config['sites'])
+  sites = models.get_sites(config['sites'])
 
   # and use it for main loop
-  main_threads(repeat_rate, models.sites)
+  main(repeat_rate, sites)
 
-  webapp.run(host='0.0.0.0', port=80)
+  webapp.run(host='0.0.0.0', port=8080)

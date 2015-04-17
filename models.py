@@ -37,14 +37,14 @@ class Site(object):
   def add_time(self, response_time):
     if type(response_time) != float:
       raise TypeError("response time must be a float")
-    self.resp_time.append([time.time(), response_time])
+    self.resp_time.append([time.time(), response_time*1000.0])
 
 def pickle_to_file(sites):
-
   if sites:
     if type(sites) == list:
       if type(sites[0]) == Site:
         with open(saved_sites_file, 'wb') as output:
+
           pickle.dump(sites, output, pickle.HIGHEST_PROTOCOL)
           return
   raise TypeError("Site list empty or of incorrect type")

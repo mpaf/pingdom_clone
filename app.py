@@ -9,15 +9,11 @@ from optparse import OptionParser
 from flask import Flask, render_template
 
 webapp = Flask(__name__)
-global sites
-
-sites = []
 
 @webapp.route('/')
 def http_index():
-  global sites
 
-  return render_template('index.html', sites=sites)
+  return render_template('index.html', sites=models.sites)
 
 # Frequency at which checks are run
 # (except if overriden by config file
@@ -71,26 +67,14 @@ def check_site(site, timeout):
         t.daemon=True
         t.start()
 
-def dump_sites(dump_rate=DUMP_RATE):
-    ''' pickle Site objects to the filesystem
-        ran periodically at dump_rate, or when
-        app exits '''
-    global sites
-    logger.info("saving all site data to disk")
-    models.pickle_to_file(sites)
-    t = threading.Timer(dump_rate, dump_sites)
-    t.daemon=True
-    t.start()
-    return
-
 def main(repeat_rate, sites):
 
     # dump all sites and response times to a pickled file
     # in the current directory
-    atexit.register(dump_sites)
+    atexit.register(models.dump_sites, [sites])
 
     # set a recurring thread to dump all site info to disk
-    t=threading.Timer(DUMP_RATE, dump_sites, [DUMP_RATE])
+    t=threading.Timer(DUMP_RATE, models.dump_sites, [sites, DUMP_RATE])
     t.daemon=True
     t.start()
 
@@ -110,7 +94,10 @@ if __name__ == '__main__':
 
   (options, args) = parser.parse_args()
   config = yaml.load(open(config_file, 'r'))
-  sites = models.get_sites(config['sites'])
+
+  # store reference to list of sites in models
+  # namespace to retrieve it in webserver views.
+  models.sites = models.get_sites(config['sites'])
 
   logger.setLevel(getattr(logging, options.loglevel))
 
@@ -130,5 +117,5 @@ if __name__ == '__main__':
     repeat_rate = DEFAULT_RATE # How often will a site be 'pinged'
 
   logger.info("Site refresh rate set to {0}".format(repeat_rate))
-  main(repeat_rate, sites)
+  main(repeat_rate, models.sites)
   webapp.run(debug=True, host='0.0.0.0', port=8080)

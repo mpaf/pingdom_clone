@@ -1,4 +1,5 @@
 import time
+import threading
 import pickle
 import logging
 
@@ -7,7 +8,14 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
 
+# File where to save Site data
 saved_sites_file = 'saved_sites.pkl'
+# Frequency at which Site data is saved to disk
+DUMP_RATE = 30
+
+# This variable keeps the list of Site objects
+# and their all-time response times in memory
+# during the application run.
 
 class Site(object):
 
@@ -42,7 +50,21 @@ def pickle_to_file(sites):
           return
   raise TypeError("Site list empty or of incorrect type")
 
-def pickled_sites():
+# No worries passing variables referencing large
+# data to functions, as Python passes it by reference
+def dump_sites(sites, dump_rate=DUMP_RATE):
+    ''' pickle Site objects to the filesystem
+        ran periodically at dump_rate, or when
+        app exits '''
+
+    logger.info("saving all site data to disk")
+    pickle_to_file(sites)
+    t = threading.Timer(dump_rate, dump_sites, [sites])
+    t.daemon=True
+    t.start()
+    return
+
+def get_pickled_sites():
 
   # Try to get list of Site models
   try:
@@ -75,7 +97,7 @@ def get_sites(cfg_sites_dict):
       to disk '''
 
   cfg_sites = configed_sites(cfg_sites_dict)
-  saved_sites = pickled_sites()
+  saved_sites = get_pickled_sites()
   for cfg_site in cfg_sites:
     logger.debug('process cfg site {0}'.format(cfg_site))
     found_saved = next((x for x in saved_sites if x.url == cfg_site.url), None)

@@ -23,8 +23,8 @@ Date: 15-04-2015
 
 If you have docker installed, you can run this application simply by running the following commands:
 ```sh
-  docker build -t pingdom_clone .
-  docker run -d -p 8080:8080 pingdom_clone
+  (sudo) docker build -t pingdom_clone .
+  (sudo) docker run -d -p 8080:8080 pingdom_clone
 ```
 And visit:
 http://localhost:8080/

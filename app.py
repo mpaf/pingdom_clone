@@ -161,4 +161,4 @@ if __name__ == '__main__':
   # and use it for main loop
   main_threads(repeat_rate, models.sites)
 
-  webapp.run(host='0.0.0.0', port=8080)
+  webapp.run(host='0.0.0.0', port=80)

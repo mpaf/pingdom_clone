@@ -20,3 +20,5 @@ sites:
       content: This is not the web page
     - url: https://aws.amazon.com
       content: Amazon
+    - url: http://localhost:8080/500
+      content: error

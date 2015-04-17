@@ -19,7 +19,7 @@ DUMP_RATE = 30
 CONFIG_FILE = 'config.yml'
 
 # Set up logging
-LOG_FILE = 'check_results.log'
+LOG_FILE = 'site_results.log'
 
 formatter = logging.Formatter(
   '%(asctime)s | %(name)s | %(levelname)s: %(message)s'
@@ -48,12 +48,12 @@ def check_site(site, timeout):
         site.last_http_code = r.status_code
         site.string_matched = site.content_str in r.text
         if site.string_matched:
-            content_string = '{0} Found!'.format(site.content_str)
+            content_string = '"{0}" Found!'.format(site.content_str)
         else:
-            content_string = '{0} NOT found!'.format(site.content_str)
+            content_string = '"{0}" NOT found!'.format(site.content_str)
         logger.info(
-            "Url:{0} returned HTTP code {1} in {2}s, {3} ({4})"
-            .format(site.url, r.status_code, r.elapsed.total_seconds(),
+            "{0} returned HTTP code {1} in {2}ms, {3} ({4})"
+            .format(site.url, r.status_code, r.elapsed.total_seconds()*1000.0,
                     content_string, r.encoding)
         )
         # set the daemon flag to exit the application, once the main
@@ -62,7 +62,7 @@ def check_site(site, timeout):
         t.daemon=True
         t.start()
     except requests.exceptions.Timeout:
-        logger.warning("Timed out (>{1}) checking for {0}, will try again".
+        logger.warning("Timed out (>{1}) checking for {0}, will keep trying".
                         format(site.url, timeout))
         t = threading.Timer(repeat_rate, check_site, [site, timeout])
         t.daemon=True
@@ -72,7 +72,7 @@ def check_site(site, timeout):
         # exception requesting site, log warning and wait some time
         # before attempting to request site again
         # wait 5x the normal check repeat rate
-        logger.warning("Exception requesting {0}: {1}, will wait then try again".
+        logger.warning("{0} EXCEPTION: {1}, will try again after a while".
                         format(site.url, e))
         t = threading.Timer(5*repeat_rate, check_site, [site, timeout])
         t.daemon=True
@@ -85,15 +85,26 @@ def http_index():
   # render a webpage with all the site information collected so far
   return render_template('index.html', sites=models.sites)
 
-def main(repeat_rate, sites):
+@webapp.route('/500')
+def error_page():
+  # Always generate a server error, for testing pingdom-clone
+  return "This is a page returning a HTTP 500 error", 500
+
+@webapp.errorhandler(404)
+def pageNotFound(error):
+    return "What did you want to see here?", 404
+
+@webapp.errorhandler(500)
+def pageError(error):
+    return "Wow, you crashed our server! :'("
+
+def main_threads(repeat_rate, sites):
   """ This function will start two daemon thread loops repeating
       every repeat_rate and DUMP_RATE to check url response and
       dump current Site model information to disk respectively. """
-
   # dump all sites and response times to a pickled file
-  # in the current directory
+  # in the current directory if application exits
   atexit.register(models.dump_sites, [sites])
-
   # set a recurring thread to dump all site info to disk
   t=threading.Timer(DUMP_RATE, models.dump_sites, [sites, DUMP_RATE])
   t.daemon=True
@@ -101,7 +112,9 @@ def main(repeat_rate, sites):
 
   for site in sites:
     # adjust timeout to be slightly smaller than refresh rate of thread
-    threading.Thread(target=check_site, args=(site, repeat_rate-0.01), daemon=True).start()
+    t=threading.Timer(repeat_rate, check_site, [site, repeat_rate-0.01])
+    t.daemon=True
+    t.start()
 
 if __name__ == '__main__':
   """ Main application entry point
@@ -122,10 +135,6 @@ if __name__ == '__main__':
   (options, args) = parser.parse_args()
   config = yaml.load(open(CONFIG_FILE, 'r'))
 
-  # store reference to list of sites in models
-  # namespace to retrieve it in webserver views.
-  models.sites = models.get_sites(config['sites'])
-
   # Change logging level in the streamhandler
   streamhandler.setLevel(getattr(logging, options.loglevel))
 
@@ -143,7 +152,13 @@ if __name__ == '__main__':
     repeat_rate = int(config['refresh_rate'])
   else:
     repeat_rate = DEFAULT_RATE # How often will a site be 'pinged'
-
   logger.debug("Site refresh rate set to {0}".format(repeat_rate))
-  main(repeat_rate, models.sites)
-  webapp.run(debug=True, host='0.0.0.0', port=8080)
+
+  # store reference to list of sites in models
+  # namespace to retrieve it in webserver views.
+  models.sites = models.get_sites(config['sites'])
+
+  # and use it for main loop
+  main_threads(repeat_rate, models.sites)
+
+  webapp.run(host='0.0.0.0', port=8080)

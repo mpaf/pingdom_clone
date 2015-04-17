@@ -37,7 +37,6 @@ class Site(object):
   def add_time(self, response_time):
     if type(response_time) != float:
       raise TypeError("response time must be a float")
-    logger.info("saving response time: {0}".format(response_time))
     self.resp_time.append([time.time(), response_time])
 
 def pickle_to_file(sites):
@@ -57,7 +56,7 @@ def dump_sites(sites, dump_rate=DUMP_RATE):
         ran periodically at dump_rate, or when
         app exits '''
 
-    logger.info("saving all site data to disk")
+    logger.debug("saving all site data to disk")
     pickle_to_file(sites)
     t = threading.Timer(dump_rate, dump_sites, [sites])
     t.daemon=True
@@ -85,7 +84,7 @@ def configed_sites(sites_dict):
     site_obj = Site(site['url'], site['content'])
     if site_obj in cfg_sites:  # this works thanks to equality and hash
                                # functions defined in class
-        logger.warning('Found duplicate site {0}'.format(site_obj.url))
+        logger.debug('Found duplicate site {0}'.format(site_obj.url))
     else:
         cfg_sites.append(site_obj)
         logger.debug('found site {0} in config file'.format(site_obj.url))

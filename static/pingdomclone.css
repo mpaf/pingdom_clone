@@ -1,10 +1,10 @@
-body ul li span {
+body ul li div a {
   vertical-align: middle;
-  font-size: 20wpx;
+  font-size: 14px;
 }
 
 span {
-  padding: 12px;
+  vertical-align: middle;
 }
 
 span.glyphicon {
@@ -27,9 +27,15 @@ span.nomatch {
   color: #FBB917;
 }
 
+div.url {
+  display: inline-block;
+  width:200px;
+  word-wrap: break-word;
+}
+
 div.responsetimes {
   display: inline-block;
   vertical-align: middle;
   width: 500px;
-  height: 300px;
+  height: 250px;
 }

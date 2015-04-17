@@ -55,20 +55,19 @@
   <ul>
   {% for site in sites %}
   <li>
-    <span><a href="{{site.url}}">{{site.url}}</a></span>
-    <span>HTTP {{site.last_http_code}}</span>
+    <div class="url"><a href="{{site.url}}">{{site.url}}</a></div>
     <div class="responsetimes" id="chart{{loop.index}}"></div>
     {% if not site.last_http_code %}
     <span class="glyphicon glyphicon-minus unknown" aria-hidden="true"></span>
     {% elif site.last_http_code >= 200 and site.last_http_code < 300 and site.string_matched %}
     <span class="glyphicon glyphicon-arrow-up checkup" aria-hidden="true"></span>
-    <span>"{{site.content_str}}" found on page</span>
+    <span>"{{site.content_str}}" found on page (HTTP {{site.last_http_code}})</span>
     {% elif site.last_http_code >= 200 and site.last_http_code < 300 and not site.string_matched %}
     <span class="glyphicon glyphicon-arrow-down nomatch" aria-hidden="true"></span>
-    <span>"{{site.content_str}}" not found on page</span>
+    <span>"{{site.content_str}}" not found on page (HTTP {{site.last_http_code}})</span>
     {% else %}
     <span class="glyphicon glyphicon-arrow-down checkdown" aria-hidden="true"></span>
-    <span>HTTP Error</span>
+    <span>Error (HTTP {{site.last_http_code}})</span>
     {% endif %}
   </li>
   {% endfor %}

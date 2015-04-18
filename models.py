@@ -112,6 +112,9 @@ def get_sites(cfg_sites_dict):
     if found_saved:
       logger.debug('found saved site, copy response time series {0}'.format(found_saved.resp_time))
       cfg_site.resp_time = found_saved.resp_time
+      cfg_site.last_http_code = found_saved.last_http_code
+      cfg_site.string_matched = found_saved.string_matched
+      cfg_site.encoding = found_saved.encoding
     else:
       logger.debug('saved site not in cfg, discard')
 

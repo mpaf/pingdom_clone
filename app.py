@@ -36,7 +36,7 @@ DUMP_RATE = 30
 # and general app parameters
 CONFIG_FILE = 'config.yml'
 # Web listening port
-SERVER_PORT = 80
+SERVER_PORT = 8080
 # file where site check info will be logged
 LOG_FILE = 'site_results.log'
 
@@ -120,7 +120,7 @@ def pageNotFound(error):
 def pageError(error):
     return "Wow, you crashed our server! :'("
 
-def main(repeat_rate, sites):
+def check_loop(repeat_rate, sites):
   """ This function will start two daemon thread loops repeating
       every repeat_rate and DUMP_RATE to check url response and
       dump current Site model information to disk respectively. """
@@ -138,13 +138,11 @@ def main(repeat_rate, sites):
     t.daemon=True
     t.start()
 
-if __name__ == '__main__':
-  """ Main application entry point
-
-    Process config file and command-line options, start main function and
-    a web server listening on localhost:8080 based on the Flask web
-    microframework. To stop the script from running just type CTRL+C from
-    the terminal which will immediately exit the webserver and the threads. """
+def main():
+  """ Process config file and command-line options, start main function and
+  a web server listening on localhost:SERVER_PORT based on the Flask web
+  microframework. To stop the script from running just type CTRL+C from
+  the terminal which will immediately exit the webserver and the threads. """
 
   parser = OptionParser(description="Pingdom-like site checker, and webapp",
                         version="%prog {0}".format(VERSION))
@@ -173,7 +171,7 @@ if __name__ == '__main__':
   logger.setLevel(logging.DEBUG)
   streamhandler = logging.StreamHandler()
   filehandler = RotatingFileHandler(
-    options.logfile, maxBytes=2.5*1024*1024, backupCount=5
+    options.logfile, maxBytes=10*1024*1024, backupCount=5
   )
   filehandler.setFormatter(formatter)
   filehandler.setLevel(logging.INFO)
@@ -199,11 +197,19 @@ if __name__ == '__main__':
     repeat_rate = DEFAULT_RATE # How often will a site be 'pinged'
   logger.debug("Site refresh rate set to {0}".format(repeat_rate))
 
+  # define that sites will be a global variable also used by the
+  # web app for displaying the content
+  global sites
+
   # store reference to list of sites in models
   # namespace to retrieve it in webserver views.
   sites = models.get_sites(config['sites'])
 
-  # and use it for main loop
-  main(repeat_rate, sites)
+  # and use it for the check loop
+  check_loop(repeat_rate, sites)
 
   webapp.run(host='0.0.0.0', port=SERVER_PORT)
+
+if __name__ == '__main__':
+  """ Application entry point """
+  main()

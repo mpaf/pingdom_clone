@@ -37,7 +37,7 @@ class TestSiteModel(unittest.TestCase):
   def test_dump_site_to_html(self):
      self.site1.url = "http://www.publico.pt"
      self.site1.dump_site_for_inspection()
-     assertTrue(os.path.exists(os.path.abspath('publico.html')))
+     self.assertTrue(os.path.exists(os.path.abspath('publico.html')))
 
 class TestSitePersistence(unittest.TestCase):
 

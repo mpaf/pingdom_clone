@@ -41,7 +41,7 @@ class Site(object):
     r = requests.get(self.url)
     # remove http and .com, .net etc. from file name
     with open(self.url.split('//')[1].lstrip('www.')[:-3] + '.html', 'w') as f:
-      f.write(r.text.encode(r.encoding))
+      f.write(r.text)
 
   def add_time(self, response_time):
     if type(response_time) != float:

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Pingdom-like site content checker, logs results to file
 # and runs a webserver that shows the results of the different

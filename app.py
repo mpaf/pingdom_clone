@@ -145,7 +145,7 @@ if __name__ == '__main__':
     microframework. To stop the script from running just type CTRL+C from
     the terminal which will immediately exit the webserver and the threads. """
 
-  parser = OptionParser(description="Pingdom-like site checker",
+  parser = OptionParser(description="Pingdom-like site checker, and webapp",
                         version="%prog {0}".format(VERSION))
   parser.add_option("-l", "--loglevel", dest="loglevel", default="INFO",
                     help="Set logging level")

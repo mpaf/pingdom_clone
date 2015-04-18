@@ -22,7 +22,7 @@ CONFIG_FILE = 'config.yml'
 LOG_FILE = 'site_results.log'
 
 formatter = logging.Formatter(
-  '%(asctime)s | %(name)s | %(levelname)s: %(message)s'
+  '%(asctime)s: %(message)s'
 )
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -30,11 +30,12 @@ streamhandler = logging.StreamHandler()
 filehandler = RotatingFileHandler(
   LOG_FILE, maxBytes=10*1024*1024, backupCount=5
 )
+filehandler.setFormatter(formatter)
 filehandler.setLevel(logging.INFO)
 logger.addHandler(streamhandler)
 logger.addHandler(filehandler)
 
-def check_site(site, timeout):
+def check_site(site, repeat_rate, timeout):
     """ This function pings the site['url'] and attempts
         to find site['content']. It will run every x secs
         in a thread """
@@ -46,6 +47,7 @@ def check_site(site, timeout):
         # add response time to time-series
         site.add_time(r.elapsed.total_seconds())
         site.last_http_code = r.status_code
+        site.encoding = r.encoding
         site.string_matched = site.content_str in r.text
         if site.string_matched:
             content_string = '"{0}" Found!'.format(site.content_str)
@@ -58,13 +60,13 @@ def check_site(site, timeout):
         )
         # set the daemon flag to exit the application, once the main
         # process stops
-        t = threading.Timer(repeat_rate, check_site, [site, timeout])
+        t = threading.Timer(repeat_rate, check_site, [site, repeat_rate, timeout])
         t.daemon=True
         t.start()
     except requests.exceptions.Timeout:
         logger.warning("Timed out (>{1}) checking for {0}, will keep trying".
                         format(site.url, timeout))
-        t = threading.Timer(repeat_rate, check_site, [site, timeout])
+        t = threading.Timer(repeat_rate, check_site, [site, repeat_rate, timeout])
         t.daemon=True
         t.start()
 
@@ -74,7 +76,7 @@ def check_site(site, timeout):
         # wait 5x the normal check repeat rate
         logger.warning("{0} EXCEPTION: {1}, will try again after a while".
                         format(site.url, e))
-        t = threading.Timer(5*repeat_rate, check_site, [site, timeout])
+        t = threading.Timer(5*repeat_rate, check_site, [site, repeat_rate, timeout])
         t.daemon=True
         t.start()
 
@@ -113,7 +115,7 @@ def main(repeat_rate, sites):
 
   for site in sites:
     # adjust timeout to be slightly smaller than refresh rate of thread
-    t=threading.Timer(repeat_rate, check_site, [site, repeat_rate-0.01])
+    t=threading.Timer(repeat_rate, check_site, [site, repeat_rate, repeat_rate-0.01])
     t.daemon=True
     t.start()
 

@@ -34,6 +34,14 @@ If you want to change command-line parameters for the application, you can eithe
   docker run -d -p 8080:8080 pingdom_clone python app.py -r 1 --nohistory -l DEBUG
 ```
 
+## Testing
+
+All tests are in the tests/ folder and use Python's standard unittest module.
+To find all the tests and run them, simply run from the project top folder:
+```sh
+  python tests.py
+```
+
 ##Design considerations:
 
 ### Distributed checks

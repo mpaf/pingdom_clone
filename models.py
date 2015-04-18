@@ -9,7 +9,7 @@ logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
 
 # File where to save Site data
-saved_sites_file = 'saved_sites.pkl'
+SAVED_SITES_FILE = 'saved_sites.pkl'
 # Frequency at which Site data is saved to disk
 DUMP_RATE = 30
 
@@ -33,6 +33,7 @@ class Site(object):
     self.resp_time=[]
     self.last_http_code = None
     self.string_matched = False
+    self.encoding = None
 
   def add_time(self, response_time):
     if type(response_time) != float:
@@ -43,7 +44,7 @@ def pickle_to_file(sites):
   if sites:
     if type(sites) == list:
       if type(sites[0]) == Site:
-        with open(saved_sites_file, 'wb') as output:
+        with open(SAVED_SITES_FILE, 'wb') as output:
 
           pickle.dump(sites, output, pickle.HIGHEST_PROTOCOL)
           return
@@ -67,12 +68,12 @@ def get_pickled_sites():
 
   # Try to get list of Site models
   try:
-    with open(saved_sites_file, 'rb') as input:
+    with open(SAVED_SITES_FILE, 'rb') as input:
       saved_sites = pickle.load(input)
       for site in saved_sites:
-        logger.debug('found saved site {0} in {1}'.format(site.url, saved_sites_file))
+        logger.debug('found saved site {0} in {1}'.format(site.url, SAVED_SITES_FILE))
   except:
-    logger.debug("File {0} doesn't exist yet".format(saved_sites_file))
+    logger.debug("File {0} doesn't exist yet".format(SAVED_SITES_FILE))
     saved_sites = []
 
   return saved_sites

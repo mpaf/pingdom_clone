@@ -14,7 +14,7 @@ sites:
       content: Suojaa kaikki laitteesi</h1>
     - url: https://www.facebook.com
       content: Friends
-    - url: http://this.is.a.bad.bad.site/
+    - url: http://this.is.a.bad.bad.site.com/
       content: none
     - url: https://github.com/wrong_page
       content: This is not the web page

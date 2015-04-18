@@ -35,6 +35,14 @@ class Site(object):
     self.string_matched = False
     self.encoding = None
 
+  def dump_site_for_inspection(self):
+    ''' dump the html for a site '''
+    import requests
+    r = requests.get(self.url)
+    # remove http and .com, .net etc. from file name
+    with open(self.url.split('//')[1].lstrip('www.')[:-3] + '.html', 'w') as f:
+      f.write(r.text.encode(r.encoding))
+
   def add_time(self, response_time):
     if type(response_time) != float:
       raise TypeError("response time must be a float")

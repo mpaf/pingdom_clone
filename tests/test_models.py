@@ -27,11 +27,17 @@ class TestSiteModel(unittest.TestCase):
      self.assertEqual(self.site1.resp_time.pop()[1], 1000.0)
 
   def test_must_be_a_float(self):
+
      with self.assertRaises(TypeError):
        self.site1.add_time(1)
      with self.assertRaises(TypeError):
        self.site1.add_time('string')
      self.assertEqual(self.site1.resp_time, [])
+
+  def test_dump_site_to_html(self):
+     self.site1.url = "http://www.publico.pt"
+     self.site1.dump_site_for_inspection()
+     assertTrue(os.path.exists(os.path.abspath('publico.html')))
 
 class TestSitePersistence(unittest.TestCase):
 

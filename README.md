@@ -4,10 +4,12 @@ Author: Miguel Ferreira
 Date: 15-04-2015
 
 ##Requirements:
-  - Python 3.4
-  - python3.4-dev (Ubuntu package name, header files for compiling libyaml)
+
+  - Python >=3
+  - python3-dev (Ubuntu package name, header files for compiling libyaml)
 
 ##Installation:
+
   - checkout this repo
   - create a virtualenv with Python34 (optional)
   - install package requirements (make sure you're using right Python version)
@@ -42,22 +44,29 @@ To find all the tests and run them, simply run from the project top folder:
   python tests.py
 ```
 
-##Design considerations:
+## Design considerations
+
+  - Plot using google charts, only plots last 200 samples, to limit the extent of the plots.
+  - Check rate is in full seconds, minimum is 1s check rate.
+  - Pickling/unpicking site object data to disk to achieve data persistence. This is done at application exit but also periodically in a separate thread.
+  - Threads are daemonized so as soon as user breaks with CTRL+Cs all threads terminate
+  - If connection fails to a site, retry after a longer period of time (e.g. 10x check rate). The url could be bad but there's also a possibility of intermittent failures, so we shouldn't stop checking the url.
+  - Check results are logged with a rotating file handler to prevent size of file in disk to grow out of bounds.
 
 ### Distributed checks
+
   - Content might be different when accessing from different regions
   - Centralized data repository (database) used to synchronize the times from every checking server
   - Separate web server from check loops.
   - Sync site data across time-zones.
   - Use encrypted SSL connections to database make sure data is not tampered with
 
-### General considerations
-  - Plot using google charts, only plots last 200 samples, to limit the extent of the plots.
-  - Pickling/unpicking site object data to disk to achieve data persistence (solutions requiring a database or cache where not considered due to added complexity). This is done at application exit but also periodically in a separate thread.
-  - Threads are daemonized so as soon as user CTRL+Cs to exit all threads terminate
-  - If connection fails to a site, retry after a longer period of time (e.g. 10x check rate). The url could be bad but there's also a possibility of intermittent failures, so we shouldn't stop checking the url.
-
 ## Known Issues:
 
+  - This app launches one thread per site which can quickly overwhelm a less powerful system for hundreds of monitored sites. To prevent this, we should use a ThreadPool, or a list of 'workers' running in separate threads and listening from a queue.
   - On some sites, the requests library detects wrong encoding type (if not in headers) and seems not to match strings correctly
-  - Possible issue, as checks progress and application runs, the whole site data including response times is kept in memory, this may lead to memory growing out of bounds for long running instances, or when the cache on disk is already large - a method should be considered to dump memory to disk, at the moment it keeps both in disk and in system memory
+  - As checks progress and application runs, the whole site data including response times are kept in memory which  may lead to memory growing out of bounds for long running instances with many checks.
+
+## License
+
+The source code in this repo is distributed under the MIT License.

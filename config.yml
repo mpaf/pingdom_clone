@@ -13,7 +13,7 @@ sites:
     - url: http://www.fsecure.com
       content: Suojaa kaikki laitteesi</h1>
     - url: https://www.facebook.com
-      content: Friends
+      content: modesty
     - url: http://this.is.a.bad.bad.site.com/
       content: none
     - url: https://github.com/wrong_page
@@ -22,3 +22,15 @@ sites:
       content: Amazon
     - url: http://localhost:8080/500
       content: error
+    - url: http://localhost:80/500
+      content: error
+    - url: http://www.google.com/
+      content: search
+    - url: http://www.esa.int
+      content: Space for Europe
+    - url: http://www.python.org
+      content: Python is a programming language
+    - url: https://www.linkedin.com
+      content: Find a colleague
+    - url: http://www.reddit.com
+      content: subscribe to our newsletter

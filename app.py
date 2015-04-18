@@ -11,6 +11,9 @@
 # Author: Miguel Ferreira
 # Date: 15 April 2015
 #
+# Version: 1.0
+#
+
 import atexit
 import threading
 import requests
@@ -21,6 +24,7 @@ import yaml
 from optparse import OptionParser
 from flask import Flask, render_template
 
+VERSION = 1.0
 # Frequency at which checks are run
 # (except if overriden by config file
 #  or command-line)
@@ -141,7 +145,8 @@ if __name__ == '__main__':
     microframework. To stop the script from running just type CTRL+C from
     the terminal which will immediately exit the webserver and the threads. """
 
-  parser = OptionParser()
+  parser = OptionParser(description="Pingdom-like site checker",
+                        version="%prog {0}".format(VERSION))
   parser.add_option("-l", "--loglevel", dest="loglevel", default="INFO",
                     help="Set logging level")
   parser.add_option("--nohistory", dest="nohistory", action="store_true",

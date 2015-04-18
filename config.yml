@@ -1,9 +1,13 @@
-# Please specify your endpoints, and the expected content
+# This file configures the urls to check
+# the content (case-insensitive) to find at each url
+# and the refresh rate of the checks
 #
-#eg.
-#    - url: "http://www.google.com"
-#      content: ""
-
+# e.g.
+# sites:
+#    - url: http://www.google.com
+#      content: I'm feeling lucky
+#
+# default rate for checks, can be overriden by cmd-line
 refresh_rate: 10
 sites:
     - url: https://www.publico.pt

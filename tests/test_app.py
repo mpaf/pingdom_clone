@@ -23,6 +23,14 @@ class TestSiteChecking(unittest.TestCase):
     # no new data point (timed out)
     self.assertEqual(len(self.site1.resp_time), 2)
 
+  def test_check_case_insensitive_content(self):
+    self.site1.content_str='ClAsSiFiCaDoS'
+    app.check_site(self.site1, 5, 5)
+    self.assertTrue(self.site1.string_matched)
+    self.site1.content_str='Clansifficados'
+    app.check_site(self.site1, 5, 5)
+    self.assertFalse(self.site1.string_matched)
+    
   def test_check_http_code_and_encoding(self):
     app.check_site(self.site1, 10, 9)
     self.assertEqual(self.site1.last_http_code, 200)

@@ -3,12 +3,12 @@
 Author: Miguel Ferreira  
 Date: 15-04-2015
 
-##Requirements:
+##Requirements
 
   - Python >=3
   - python3-dev (Ubuntu package name, header files for compiling libyaml)
 
-## Installation:
+## Installation
 
   - checkout this repo
   - create a virtualenv with Python3 (optional)
@@ -80,7 +80,7 @@ To find all the tests and run them, simply run from the project top folder:
   - Sync site data across time-zones.
   - Use encrypted SSL connections to database make sure data is not tampered with
 
-## Known Issues:
+## Known Issues
 
   - This app launches one thread per site which can quickly overwhelm a less powerful system for hundreds of monitored sites. To prevent this, we should use a ThreadPool, or a list of 'workers' running in separate threads and listening from a queue.
   - On some sites, the requests library detects wrong encoding type (if not in headers) and seems not to match strings correctly

@@ -8,18 +8,37 @@ Date: 15-04-2015
   - Python >=3
   - python3-dev (Ubuntu package name, header files for compiling libyaml)
 
-##Installation:
+## Installation:
 
   - checkout this repo
-  - create a virtualenv with Python34 (optional)
+  - create a virtualenv with Python3 (optional)
   - install package requirements (make sure you're using right Python version)
 ```sh
       pip install -r requirements.txt
 ```
   - start with:
 ```sh
-      python app.py [-r check_rate] [-l LOGLEVEL] [--nohistory]
+      python app.py [-r check_rate] [-o LOGFILE] [-l LOGLEVEL] [--nohistory]
 ```
+## Usage
+
+The command-line parameters that affect the application are:
+- -r This sets the rate at which sites are checked (integer)
+- -o Output file where the check info is logged to
+- -l Log level information printed to stdout
+- --no-history Erases disk cache of site data, starts from scratch
+
+Site urls and content to match, as well as check rate, can be set in the config file (config.yml) as
+```yaml
+refresh_rate: 5
+sites:
+  - url: http://www.google.com
+    content: I feel lucky
+  - url: ...
+```
+Site urls must include the protocol (http://, https://) and subsequent duplicate urls in the config file will be ignored. If you set refresh rate in the command-line it overrides the config file.
+
+Content match is case insensitive. Changes to the config file take effect after restart of the application.
 
 ## Running from docker
 

@@ -45,7 +45,7 @@ To find all the tests and run them, simply run from the project top folder:
 ##Design considerations:
 
 ### Distributed checks
-  - Content might be different when accessing from different regions (e.g. fsecure website redirects to Finnish content in Finland, not outside)
+  - Content might be different when accessing from different regions
   - Centralized data repository (database) used to synchronize the times from every checking server
   - Separate web server from check loops.
   - Sync site data across time-zones.

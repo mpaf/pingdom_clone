@@ -42,7 +42,7 @@ Content match is case insensitive. Changes to the config file take effect after 
 
 ## Running from docker
 
-If you have docker installed, you can run this application simply by running the following commands:
+If you have docker installed, you can run this application simply by running the following commands at the root of the project:
 ```sh
   (sudo) docker build -t pingdom_clone .
   (sudo) docker run -d -p 8080:8080 pingdom_clone

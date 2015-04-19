@@ -7,6 +7,6 @@ RUN git clone https://github.com/mpaf/pingdom_clone.git /usr/src/app
 
 RUN pip install -r requirements.txt
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD [ "python", "/usr/src/app/app.py"]

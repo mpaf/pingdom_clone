@@ -83,8 +83,7 @@ To find all the tests and run them, simply run from the project top folder:
 ## Known Issues
 
   - This app launches one thread per site which can quickly overwhelm a less powerful system for hundreds of monitored sites. To prevent this, we should use a ThreadPool, or a list of 'workers' running in separate threads and listening from a queue.
-  - On some sites, the requests library detects wrong encoding type (if not in headers) and seems not to match strings correctly
-  - As checks progress and application runs, the whole site data including response times are kept in memory which  may lead to memory growing out of bounds for long running instances with many checks.
+  - As checks progress and application runs, the whole site data including response times are kept in memory which  may lead to memory growing out of bounds for long running instances with many checks. The data kept is growing at a slow pace, that is a float per site per check time (minimum one per second).
 
 ## License
 

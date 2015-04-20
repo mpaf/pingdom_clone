@@ -101,8 +101,16 @@ webapp = Flask(__name__)
 @webapp.route('/')
 def http_index():
   global sites
+
   # render a webpage with all the site information collected so far
-  return render_template('index.html', sites=sites)
+  # limit to 200 last samples
+  limited_sites = []
+  for site in sites:
+    new_site = site
+    new_site.resp_time = site.resp_time[-200:]
+    limited_sites.append(new_site)
+
+  return render_template('index.html', sites=limited_sites)
 
 # route to serve an HTTP 500 error, to test the app
 @webapp.route('/500')

@@ -36,7 +36,7 @@ DUMP_RATE = 30
 # and general app parameters
 CONFIG_FILE = 'config.yml'
 # Web listening port
-SERVER_PORT = 8080
+SERVER_PORT = 80
 # file where site check info will be logged
 LOG_FILE = 'site_results.log'
 
